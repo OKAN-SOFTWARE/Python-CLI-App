@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Task Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="workspace">
+    <header>
+      <span class="eyebrow">YOUR EVERYDAY WORKSPACE</span>
+      <h1>A little focus.<br>A lot of progress.</h1>
+      <p>Capture what needs doing, one task at a time.</p>
+    </header>
+    {% for message in get_flashed_messages() %}
+      <div class="notice" role="status">{{ message }}</div>
+    {% endfor %}
+    <div class="layout">
+      <section class="panel add-panel" aria-labelledby="add-heading">
+        <h2 id="add-heading">Add a task</h2>
+        <p class="muted">Make room for your next step.</p>
+        <form action="{{ url_for('add_task') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+          {% if error %}<div class="error" id="form-error" role="alert">{{ error }}</div>{% endif %}
+          <label for="name">Task name</label>
+          <input id="name" name="name" value="{{ name }}" placeholder="What would you like to do?" required maxlength="200">
+          <label for="priority">Priority</label>
+          <input id="priority" name="priority" type="number" min="1" max="5" step="1" value="{{ priority }}" placeholder="1–5" required aria-describedby="priority-help{% if error %} form-error{% endif %}" {% if error %}autofocus{% endif %}>
+          <p id="priority-help" class="hint">Enter a whole number from 1 to 5. Use the list controls to sort by priority or name.</p>
+          <button class="primary" type="submit">+ Add task</button>
+        </form>
+      </section>
+      <section class="panel list-panel" aria-labelledby="list-heading">
+        <div class="list-heading">
+          <h2 id="list-heading">Your tasks <span class="count">{{ tasks|length }}</span></h2>
+          <nav class="sort-controls" aria-label="Task sorting">
+            {% for field, label in [('priority', 'Priority'), ('name', 'Name')] %}
+              {% set active = sort_by == field %}
+              {% set next_order = 'desc' if active and sort_order == 'asc' else 'asc' %}
+              <a class="muted sort-label{% if active %} active{% endif %}" href="{{ url_for('index', sort_by=field, sort=next_order) }}" aria-label="Sort {{ label|lower }} {{ 'descending' if next_order == 'desc' else 'ascending' }}" {% if active %}aria-current="true"{% endif %}>{{ label }} {% if active %}{{ '↑' if sort_order == 'asc' else '↓' }}{% else %}↕{% endif %}</a>
+            {% endfor %}
+          </nav>
+        </div>
+        {% if tasks %}
+          <ol class="tasks">
+          {% for task in tasks %}
+            <li>
+              <span class="priority" aria-label="Priority {{ task.priority }}">{{ task.priority }}</span>
+              <span class="task-name">{{ task.name }}</span>
+              <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+                <button class="remove" type="submit" aria-label="Remove {{ task.name }}">Remove</button>
+              </form>
+            </li>
+          {% endfor %}
+          </ol>
+        {% else %}
+          <div class="empty"><span class="empty-icon" aria-hidden="true">✓</span><h3>A fresh start</h3><p>Add your first task and give your day a little direction.</p></div>
+        {% endif %}
+      </section>
+    </div>
+    <footer>Task Tracker · Saved locally on this computer<br>Copyright &copy; 2026 OKAN TIKTAS. All rights reserved.</footer>
+  </main>
+</body>
+</html>

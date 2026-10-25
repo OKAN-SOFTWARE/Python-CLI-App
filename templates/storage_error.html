@@ -1,0 +1,5 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Storage unavailable · Task Tracker</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><main class="workspace"><section class="panel"><h1>Tasks are unavailable</h1><p>We couldn't read or save your tasks. Check that tasks.json contains valid task data and that the app can read and write its folder.</p><p>Back up any existing file before repairing it. Your saved tasks have not been reset.</p><a href="{{ url_for('index') }}">Try again</a></section></main></body>
+</html>
